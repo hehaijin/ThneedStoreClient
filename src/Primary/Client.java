@@ -21,10 +21,10 @@ public class Client
   public Client() throws Exception
   {
     s = new Socket("127.0.0.1", 6666);
-   // System.out.println("the socket"+ s);
-    
+    // System.out.println("the socket"+ s);
+
     sc = new Scanner(s.getInputStream());
-   // System.out.println("scanner "+sc);
+    // System.out.println("scanner "+sc);
     ps = new PrintStream(s.getOutputStream());
     cm.start();
     sl.start();
@@ -50,7 +50,7 @@ public class Client
         if (command.equals("buy:"))
         {
           String amountInString = sc.next();
-          
+
           String upInString = sc.next();
           int amount = Integer.parseInt(amountInString);
           int up = Integer.parseInt(upInString);
@@ -61,20 +61,46 @@ public class Client
           } else
           {
             ps.println(command + " " + amount + " " + up);
-        //    System.out.println(command + " " + amount + " " + up);
+            // System.out.println(command + " " + amount + " " + up);
           }
 
         } else if (command.equals("sell:"))
         {
+          String amountInString = sc.next();
+
+          String upInString = sc.next();
+          int amount = Integer.parseInt(amountInString);
+          int up = Integer.parseInt(upInString);
+          sc.nextLine();
+          if (amount*up > balance)
+          {
+            System.out.println("There is not enough balance in the store! Please enter again!");
+          } else
+          {
+            ps.println(command + " " + amount + " " + up);
+            // System.out.println(command + " " + amount + " " + up);
+          }
 
         }
 
         else if (command.equals("quit:"))
         {
           end();
+          sl.end();
+          sc.close();
+          ps.close();
+          try
+          {
+            s.close();
+          } catch (IOException e)
+          {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+      
         } else if (command.equals("inventory:"))
         {
-
+           System.out.println("Current Inventory: "+thneed + " Current Balance: "+balance);  
         } else
         {
           System.out.println("Wrong input for command! Please type again!");
@@ -99,21 +125,27 @@ public class Client
       // TODO Auto-generated method stub
       while (flag)
       {
-       
         while (sc.hasNextLine())
         {
+          
           String s = sc.nextLine();
-          System.out.println(s);
+          System.out.println("Received message: "+s);
           String[] me = s.split(" ");
           if (me[0].equals("status:"))
           {
             thneed = Integer.parseInt(me[1]);
             balance = Integer.parseInt(me[2]);
-            System.out.println("Thneed store information updated: thneed "+thneed+" balance "+balance);
+           // System.out.println("Received Thneed store information update: thneed " + thneed + " balance " + balance);
           }
+         
         }
 
       }
+    }
+    
+    public void end()
+    {
+      flag=false;
     }
   }
 
@@ -121,7 +153,6 @@ public class Client
   {
     // TODO Auto-generated method stub
     Client client = new Client();
-   
 
   }
 
